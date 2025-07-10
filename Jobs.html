@@ -1,0 +1,1186 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DarkMa Manager</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #1e88e5;
+            --primary-dark: #1565c0;
+            --secondary: #2d3748;
+            --success: #43a047;
+            --warning: #ffb300;
+            --danger: #e53935;
+            --dark: #121212;
+            --darker: #0a0a0a;
+            --light: #f5f5f5;
+            --gray: #2d2d2d;
+            --border: #3d3d3d;
+            --card-bg: #1e1e1e;
+            --hover-bg: #2a2a2a;
+            --sidebar-width: 250px;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: var(--dark);
+            color: var(--light);
+            display: flex;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+        
+        /* Sidebar Styling */
+        .sidebar {
+            width: var(--sidebar-width);
+            background-color: var(--darker);
+            padding: 20px 0;
+            height: 100vh;
+            position: fixed;
+            transition: all 0.3s ease;
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .logo {
+            padding: 0 20px 20px;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 20px;
+        }
+        
+        .logo h1 {
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .logo i {
+            color: var(--primary);
+            font-size: 1.8rem;
+        }
+        
+        .nav-links {
+            list-style: none;
+            padding: 0 15px;
+            flex-grow: 1;
+        }
+        
+        .nav-links li {
+            margin-bottom: 5px;
+        }
+        
+        .nav-links a {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            text-decoration: none;
+            color: var(--light);
+            border-radius: 6px;
+            transition: all 0.3s;
+            gap: 12px;
+        }
+        
+        .nav-links a:hover, .nav-links a.active {
+            background-color: var(--hover-bg);
+            color: var(--primary);
+        }
+        
+        .nav-links i {
+            width: 24px;
+            text-align: center;
+        }
+        
+        .sidebar-footer {
+            padding: 15px;
+            border-top: 1px solid var(--border);
+            font-size: 0.9rem;
+            color: #aaa;
+        }
+        
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            padding: 20px;
+            height: 100vh;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 25px;
+        }
+        
+        .page-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .page-title i {
+            color: var(--primary);
+        }
+        
+        .user-controls {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+        
+        .system-indicators {
+            display: flex;
+            gap: 20px;
+            margin-right: 20px;
+        }
+        
+        .indicator {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.9rem;
+        }
+        
+        .indicator.cpu i { color: var(--success); }
+        .indicator.memory i { color: #3b82f6; }
+        .indicator.gpu i { color: var(--warning); }
+        .indicator.gpu-accel i { color: var(--success); }
+        
+        .indicator-badge {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+        
+        .indicator-badge.online { background-color: var(--success); }
+        .indicator-badge.offline { background-color: var(--danger); }
+        
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+        }
+        
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+        
+        /* Job Table */
+        .jobs-container {
+            flex: 1;
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .table-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+        }
+        
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid var(--border);
+            color: var(--light);
+        }
+        
+        .btn-outline:hover {
+            background-color: var(--hover-bg);
+        }
+        
+        .search-container {
+            position: relative;
+            width: 40%;
+        }
+        
+        .search-container input {
+            width: 100%;
+            padding: 12px 20px 12px 45px;
+            background-color: var(--gray);
+            border: 1px solid var(--border);
+            border-radius: 30px;
+            color: var(--light);
+            font-size: 1rem;
+        }
+        
+        .search-container i {
+            position: absolute;
+            left: 18px;
+            top: 14px;
+            color: #aaa;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        thead {
+            background-color: var(--darker);
+        }
+        
+        th {
+            padding: 16px 20px;
+            text-align: left;
+            font-weight: 500;
+            color: #aaa;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        td {
+            padding: 14px 20px;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        tbody tr:hover {
+            background-color: var(--hover-bg);
+        }
+        
+        .status {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+        }
+        
+        .status.running {
+            background-color: rgba(67, 160, 71, 0.2);
+            color: var(--success);
+        }
+        
+        .status.stopped {
+            background-color: rgba(229, 57, 53, 0.2);
+            color: var(--danger);
+        }
+        
+        .status.paused {
+            background-color: rgba(255, 179, 0, 0.2);
+            color: var(--warning);
+        }
+        
+        .progress-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+        }
+        
+        .progress-bar {
+            flex-grow: 1;
+            height: 6px;
+            background-color: var(--gray);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        
+        .progress-value {
+            height: 100%;
+            border-radius: 3px;
+        }
+        
+        .cpu-progress { background-color: var(--success); }
+        .memory-progress { background-color: #3b82f6; }
+        .gpu-progress { background-color: var(--warning); }
+        
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .icon-btn {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--gray);
+            color: var(--light);
+            cursor: pointer;
+            transition: all 0.3s;
+            border: none;
+        }
+        
+        .icon-btn:hover {
+            background-color: var(--primary);
+        }
+        
+        /* Detail Panel */
+        .detail-panel {
+            position: fixed;
+            right: 0;
+            top: 0;
+            height: 100vh;
+            width: 400px;
+            background-color: var(--darker);
+            border-left: 1px solid var(--border);
+            padding: 20px;
+            overflow-y: auto;
+            z-index: 90;
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+        }
+        
+        .detail-panel.active {
+            transform: translateX(0);
+        }
+        
+        .detail-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .detail-title {
+            font-size: 1.2rem;
+            color: var(--primary);
+        }
+        
+        .close-btn {
+            background: none;
+            border: none;
+            color: var(--light);
+            cursor: pointer;
+            font-size: 1.5rem;
+        }
+        
+        .detail-section {
+            margin-bottom: 25px;
+        }
+        
+        .detail-section h3 {
+            margin-bottom: 15px;
+            color: #aaa;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .detail-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        .detail-item {
+            background-color: var(--card-bg);
+            padding: 15px;
+            border-radius: 8px;
+        }
+        
+        .detail-label {
+            font-size: 0.8rem;
+            color: #aaa;
+            margin-bottom: 5px;
+        }
+        
+        .detail-value {
+            font-size: 1rem;
+            font-weight: 500;
+        }
+        
+        .logs-container {
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            padding: 15px;
+            height: 200px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+        
+        .log-entry {
+            margin-bottom: 8px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--gray);
+        }
+        
+        .log-time {
+            color: #aaa;
+            margin-right: 10px;
+        }
+
+        /* Enterprise Features */
+        .enterprise-features {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .feature-card {
+            background: var(--card-bg);
+            border-radius: 8px;
+            padding: 15px;
+            border-left: 3px solid var(--primary);
+        }
+        
+        .feature-card h4 {
+            margin: 0 0 10px 0;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .feature-card p {
+            font-size: 0.9rem;
+            color: #aaa;
+        }
+        
+        /* Footer */
+        .footer {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px;
+            background-color: var(--darker);
+            color: #aaa;
+            font-size: 0.9rem;
+            border-top: 1px solid var(--border);
+        }
+        
+        .footer-info {
+            display: flex;
+            gap: 20px;
+        }
+        
+        .footer-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .footer-item i {
+            color: var(--primary);
+        }
+
+        /* Latenzleiste */
+        .latency-bar {
+            display: flex;
+            background: var(--darker);
+            border-radius: 6px;
+            padding: 8px 15px;
+            margin-top: 15px;
+            font-size: 0.8rem;
+        }
+        
+        .latency-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 5px;
+        }
+        
+        .latency-value {
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin: 3px 0;
+        }
+        
+        .good { color: var(--success); }
+        .warning { color: var(--warning); }
+        .critical { color: var(--danger); }
+        
+        /* Performance Indicators */
+        .performance-indicators {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .indicator-card {
+            flex: 1;
+            background: var(--card-bg);
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+        }
+        
+        .indicator-card h4 {
+            margin: 0 0 10px 0;
+            color: #aaa;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+        
+        .indicator-value {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .indicator-desc {
+            font-size: 0.75rem;
+            color: #777;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .detail-panel {
+                width: 350px;
+            }
+        }
+        
+        @media (max-width: 992px) {
+            .sidebar {
+                width: 70px;
+            }
+            
+            .logo h1 span, .nav-links a span {
+                display: none;
+            }
+            
+            .logo h1 {
+                justify-content: center;
+            }
+            
+            .nav-links a {
+                justify-content: center;
+                padding: 15px;
+            }
+            
+            .main-content {
+                margin-left: 70px;
+            }
+            
+            .detail-panel {
+                width: 100%;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .search-container {
+                width: 100%;
+                margin-top: 15px;
+            }
+            
+            .top-bar {
+                flex-wrap: wrap;
+            }
+            
+            .detail-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .system-indicators {
+                display: none;
+            }
+            
+            .performance-indicators {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar Navigation -->
+    <nav class="sidebar">
+        <div class="logo">
+            <h1><i class="fas fa-brain"></i> <span>DarkMa Manager</span></h1>
+        </div>
+        <ul class="nav-links">
+            <li><a href="#" class="active"><i class="fas fa-tasks"></i> <span>Jobs</span></a></li>
+            <li><a href="#"><i class="fas fa-server"></i> <span>Worker/Nodes</span></a></li>
+            <li><a href="#"><i class="fas fa-microchip"></i> <span>Systemressourcen</span></a></li>
+            <li><a href="#"><i class="fas fa-file-alt"></i> <span>Logs</span></a></li>
+            <li><a href="#"><i class="fas fa-cog"></i> <span>Einstellungen</span></a></li>
+        </ul>
+        <div class="sidebar-footer">
+            <div class="indicator">
+                <span class="indicator-badge online"></span>
+                Backend: Online
+            </div>
+            <div>Version 1.2.0</div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Top Bar -->
+        <div class="top-bar">
+            <div class="page-title">
+                <i class="fas fa-tasks"></i>
+                <h2>Jobs Übersicht</h2>
+            </div>
+            
+            <div class="user-controls">
+                <div class="system-indicators">
+                    <div class="indicator cpu">
+                        <i class="fas fa-microchip"></i>
+                        CPU: 24%
+                    </div>
+                    <div class="indicator gpu-accel">
+                        <i class="fas fa-bolt"></i>
+                        GPU-Beschl.: Aktiv
+                    </div>
+                    <div class="indicator memory">
+                        <i class="fas fa-memory"></i>
+                        RAM: 3.4/128 GB
+                    </div>
+                    <div class="indicator gpu">
+                        <i class="fas fa-gem"></i>
+                        GPU: 18%
+                    </div>
+                </div>
+                
+                <div class="user-profile">
+                    <div class="avatar">JD</div>
+                    <span>John Doe</span>
+                    <i class="fas fa-caret-down"></i>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Search -->
+        <div class="search-container">
+            <i class="fas fa-search"></i>
+            <input type="text" placeholder="Jobs suchen...">
+        </div>
+
+        <!-- Jobs Table -->
+        <div class="jobs-container">
+            <div class="table-header">
+                <div class="table-actions">
+                    <button class="btn btn-primary"><i class="fas fa-plus"></i> Neuer Job</button>
+                    <button class="btn btn-outline"><i class="fas fa-sync-alt"></i> Aktualisieren</button>
+                </div>
+                <div>Angezeigt: <strong>5</strong> Jobs</div>
+            </div>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Typ</th>
+                        <th>Status</th>
+                        <th>CPU</th>
+                        <th>RAM</th>
+                        <th>Latenz</th>
+                        <th>Startzeit</th>
+                        <th>Aktionen</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="job-row" data-id="1">
+                        <td>Whale Detection</td>
+                        <td>Marktanalyse</td>
+                        <td><span class="status running"><i class="fas fa-play-circle"></i> Laufend</span></td>
+                        <td>
+                            <div class="progress-container">
+                                <span>14.2%</span>
+                                <div class="progress-bar">
+                                    <div class="progress-value cpu-progress" style="width: 14.2%"></div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="progress-container">
+                                <span>412 MB</span>
+                                <div class="progress-bar">
+                                    <div class="progress-value memory-progress" style="width: 32%"></div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="good">32ms</span>
+                        </td>
+                        <td>vor 2 Stunden</td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="icon-btn" title="Anhalten"><i class="fas fa-pause"></i></button>
+                                <button class="icon-btn" title="Stoppen"><i class="fas fa-stop"></i></button>
+                                <button class="icon-btn" title="Details"><i class="fas fa-info-circle"></i></button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr class="job-row" data-id="2">
+                        <td>Trend Prognose</td>
+                        <td>ML Vorhersage</td>
+                        <td><span class="status running"><i class="fas fa-play-circle"></i> Laufend</span></td>
+                        <td>
+                            <div class="progress-container">
+                                <span>8.7%</span>
+                                <div class="progress-bar">
+                                    <div class="progress-value cpu-progress" style="width: 8.7%"></div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="progress-container">
+                                <span>287 MB</span>
+                                <div class="progress-bar">
+                                    <div class="progress-value memory-progress" style="width: 22%"></div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="warning">45ms</span>
+                        </td>
+                        <td>vor 45 Minuten</td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="icon-btn" title="Anhalten"><i class="fas fa-pause"></i></button>
+                                <button class="icon-btn" title="Stoppen"><i class="fas fa-stop"></i></button>
+                                <button class="icon-btn" title="Details"><i class="fas fa-info-circle"></i></button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr class="job-row" data-id="3">
+                        <td>Orderbuch Analyse</td>
+                        <td>Echtzeitanalyse</td>
+                        <td><span class="status paused"><i class="fas fa-pause-circle"></i> Pausiert</span></td>
+                        <td>
+                            <div class="progress-container">
+                                <span>0%</span>
+                                <div class="progress-bar">
+                                    <div class="progress-value cpu-progress" style="width: 0%"></div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="progress-container">
+                                <span>0 MB</span>
+                                <div class="progress-bar">
+                                    <div class="progress-value memory-progress" style="width: 0%"></div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>-</td>
+                        <td>vor 1 Tag</td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="icon-btn" title="Starten"><i class="fas fa-play"></i></button>
+                                <button class="icon-btn" title="Stoppen"><i class="fas fa-stop"></i></button>
+                                <button class="icon-btn" title="Details"><i class="fas fa-info-circle"></i></button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr class="job-row" data-id="4">
+                        <td>Volatilitäts Scanner</td>
+                        <td>Marktanalyse</td>
+                        <td><span class="status running"><i class="fas fa-play-circle"></i> Laufend</span></td>
+                        <td>
+                            <div class="progress-container">
+                                <span>6.3%</span>
+                                <div class="progress-bar">
+                                    <div class="progress-value cpu-progress" style="width: 6.3%"></div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="progress-container">
+                                <span>521 MB</span>
+                                <div class="progress-bar">
+                                    <div class="progress-value memory-progress" style="width: 41%"></div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="critical">82ms</span>
+                        </td>
+                        <td>vor 3 Stunden</td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="icon-btn" title="Anhalten"><i class="fas fa-pause"></i></button>
+                                <button class="icon-btn" title="Stoppen"><i class="fas fa-stop"></i></button>
+                                <button class="icon-btn" title="Details"><i class="fas fa-info-circle"></i></button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr class="job-row" data-id="5">
+                        <td>Sentiment Analyse</td>
+                        <td>NLP Verarbeitung</td>
+                        <td><span class="status stopped"><i class="fas fa-stop-circle"></i> Gestoppt</span></td>
+                        <td>
+                            <div class="progress-container">
+                                <span>0%</span>
+                                <div class="progress-bar">
+                                    <div class="progress-value cpu-progress" style="width: 0%"></div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="progress-container">
+                                <span>0 MB</span>
+                                <div class="progress-bar">
+                                    <div class="progress-value memory-progress" style="width: 0%"></div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>-</td>
+                        <td>vor 5 Tagen</td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="icon-btn" title="Starten"><i class="fas fa-play"></i></button>
+                                <button class="icon-btn" title="Löschen"><i class="fas fa-trash"></i></button>
+                                <button class="icon-btn" title="Details"><i class="fas fa-info-circle"></i></button>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <!-- Latenzleiste (40% kleiner) -->
+            <div class="latency-bar">
+                <div class="latency-item">
+                    <div>GPU-Beschleunigung</div>
+                    <div class="latency-value good">Aktiv</div>
+                    <div class="indicator-desc">NVIDIA RTX 4090</div>
+                </div>
+                <div class="latency-item">
+                    <div>Durchschn. Latenz</div>
+                    <div class="latency-value good">34ms</div>
+                    <div class="indicator-desc">Grün: &lt;40ms</div>
+                </div>
+                <div class="latency-item">
+                    <div>Spitzenlatenz</div>
+                    <div class="latency-value critical">78ms</div>
+                    <div class="indicator-desc">Rot: &gt;80ms</div>
+                </div>
+            </div>
+            
+            <div class="footer">
+                <div class="footer-info">
+                    <div class="footer-item">
+                        <i class="fas fa-database"></i>
+                        <span>2.92 GB / 20.95 GB</span>
+                    </div>
+                    <div class="footer-item">
+                        <i class="fas fa-sync-alt"></i>
+                        <span>Letzte Aktualisierung: vor 0 Sekunden</span>
+                    </div>
+                    <div class="footer-item">
+                        <i class="fas fa-shield-alt"></i>
+                        <span>JWT Authentifiziert</span>
+                    </div>
+                </div>
+                <div>© 2023 DarkMa Manager</div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Detail Panel -->
+    <div class="detail-panel" id="detailPanel">
+        <div class="detail-header">
+            <h3 class="detail-title">Job Details</h3>
+            <button class="close-btn" id="closeDetail">&times;</button>
+        </div>
+        
+        <div class="detail-section">
+            <h3><i class="fas fa-info-circle"></i> Allgemeine Informationen</h3>
+            <div class="detail-grid">
+                <div class="detail-item">
+                    <div class="detail-label">Job ID</div>
+                    <div class="detail-value">JOB-001</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Name</div>
+                    <div class="detail-value">Whale Detection</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Typ</div>
+                    <div class="detail-value">Marktanalyse</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Status</div>
+                    <div class="detail-value"><span class="status running">Laufend</span></div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Erstellt am</div>
+                    <div class="detail-value">2023-10-15 14:30</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Gestartet am</div>
+                    <div class="detail-value">2023-10-20 09:15</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="detail-section">
+            <h3><i class="fas fa-microchip"></i> Ressourcennutzung</h3>
+            <div class="detail-grid">
+                <div class="detail-item">
+                    <div class="detail-label">CPU Auslastung</div>
+                    <div class="detail-value">14.2%</div>
+                    <div class="progress-bar">
+                        <div class="progress-value cpu-progress" style="width: 14.2%"></div>
+                    </div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">RAM Nutzung</div>
+                    <div class="detail-value">412 MB</div>
+                    <div class="progress-bar">
+                        <div class="progress-value memory-progress" style="width: 32%"></div>
+                    </div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">GPU Auslastung</div>
+                    <div class="detail-value">8.5%</div>
+                    <div class="progress-bar">
+                        <div class="progress-value gpu-progress" style="width: 8.5%"></div>
+                    </div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Laufzeit</div>
+                    <div class="detail-value">2 Stunden 15 Minuten</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Durchschn. Latenz</div>
+                    <div class="detail-value"><span class="good">32ms</span></div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Spitzenlatenz</div>
+                    <div class="detail-value"><span class="warning">78ms</span></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="detail-section">
+            <h3><i class="fas fa-cogs"></i> Parameter & Konfiguration</h3>
+            <div class="detail-grid">
+                <div class="detail-item">
+                    <div class="detail-label">Analyseintervall</div>
+                    <div class="detail-value">5 Minuten</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Sensitivität</div>
+                    <div class="detail-value">Hoch</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Markt</div>
+                    <div class="detail-value">BTC/USDT</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Modellversion</div>
+                    <div class="detail-value">v2.1.3</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Indikatorquelle</div>
+                    <div class="detail-value">Backend-Zentrale</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">GPU-Beschleunigung</div>
+                    <div class="detail-value">Aktiv (CUDA)</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="detail-section">
+            <h3><i class="fas fa-terminal"></i> Letzte Logs</h3>
+            <div class="logs-container">
+                <div class="log-entry">
+                    <span class="log-time">12:45:23</span>
+                    <span>[INFO] Analysezyklus gestartet</span>
+                </div>
+                <div class="log-entry">
+                    <span class="log-time">12:44:57</span>
+                    <span>[INFO] Marktdaten erfolgreich geladen</span>
+                </div>
+                <div class="log-entry">
+                    <span class="log-time">12:44:32</span>
+                    <span>[PROCESS] Whale-Aktivität erkannt: 3.5 BTC Kauforder</span>
+                </div>
+                <div class="log-entry">
+                    <span class="log-time">12:43:18</span>
+                    <span>[INFO] Datenverarbeitung abgeschlossen</span>
+                </div>
+                <div class="log-entry">
+                    <span class="log-time">12:42:05</span>
+                    <span>[INFO] Ergebnisse an Frontend gesendet</span>
+                </div>
+                <div class="log-entry">
+                    <span class="log-time">12:41:30</span>
+                    <span>[PERF] GPU-Beschleunigung aktiv - 8.5% Auslastung</span>
+                </div>
+                <div class="log-entry">
+                    <span class="log-time">12:40:22</span>
+                    <span>[PERF] Berechnungslatenz: 32ms</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="detail-section">
+            <h3><i class="fas fa-shield-alt"></i> Enterprise Features</h3>
+            <div class="enterprise-features">
+                <div class="feature-card">
+                    <h4><i class="fas fa-redo"></i> Disaster Recovery</h4>
+                    <p>Automatische Job-Wiederaufnahme nach Systemabstürzen</p>
+                </div>
+                <div class="feature-card">
+                    <h4><i class="fas fa-lock"></i> Sicherheit</h4>
+                    <p>JWT-Authentifizierung + Vault für API-Keys</p>
+                </div>
+                <div class="feature-card">
+                    <h4><i class="fas fa-users-cog"></i> Rollenmanagement</h4>
+                    <p>RBAC mit granularer Berechtigungssteuerung</p>
+                </div>
+                <div class="feature-card">
+                    <h4><i class="fas fa-bolt"></i> Latenzoptimierung</h4>
+                    <p>RabbitMQ für Job-Verteilung mit Priorisierung</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="detail-section">
+            <div class="table-actions">
+                <button class="btn btn-outline"><i class="fas fa-pause"></i> Anhalten</button>
+                <button class="btn btn-outline"><i class="fas fa-stop"></i> Stoppen</button>
+                <button class="btn btn-outline"><i class="fas fa-file-export"></i> Logs exportieren</button>
+                <button class="btn btn-primary"><i class="fas fa-bolt"></i> GPU erzwingen</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Detail Panel Handling
+        const detailPanel = document.getElementById('detailPanel');
+        const closeDetail = document.getElementById('closeDetail');
+        const jobRows = document.querySelectorAll('.job-row');
+        
+        jobRows.forEach(row => {
+            row.addEventListener('click', function(e) {
+                if (!e.target.closest('.icon-btn')) {
+                    detailPanel.classList.add('active');
+                }
+            });
+        });
+        
+        closeDetail.addEventListener('click', function() {
+            detailPanel.classList.remove('active');
+        });
+        
+        // Toggle job status
+        const actionButtons = document.querySelectorAll('.icon-btn');
+        
+        actionButtons.forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const row = this.closest('tr');
+                const statusElement = row.querySelector('.status');
+                
+                if (this.querySelector('i').classList.contains('fa-pause')) {
+                    statusElement.className = 'status paused';
+                    statusElement.innerHTML = '<i class="fas fa-pause-circle"></i> Pausiert';
+                } else if (this.querySelector('i').classList.contains('fa-stop')) {
+                    statusElement.className = 'status stopped';
+                    statusElement.innerHTML = '<i class="fas fa-stop-circle"></i> Gestoppt';
+                } else if (this.querySelector('i').classList.contains('fa-play')) {
+                    statusElement.className = 'status running';
+                    statusElement.innerHTML = '<i class="fas fa-play-circle"></i> Laufend';
+                }
+            });
+        });
+        
+        // Simulate resource usage changes
+        setInterval(() => {
+            document.querySelectorAll('.progress-value.cpu-progress').forEach(el => {
+                if (el.closest('tr').querySelector('.status').classList.contains('running')) {
+                    const currentWidth = parseFloat(el.style.width);
+                    const newWidth = Math.max(0, Math.min(100, currentWidth + (Math.random() - 0.5) * 2));
+                    el.style.width = newWidth + '%';
+                    el.previousElementSibling.textContent = newWidth.toFixed(1) + '%';
+                }
+            });
+            
+            // Update latency indicators
+            document.querySelectorAll('td:nth-child(6) span').forEach(el => {
+                if (el.textContent !== '-') {
+                    const currentValue = parseInt(el.textContent);
+                    const newValue = Math.max(20, Math.min(90, currentValue + Math.floor(Math.random() * 10) - 5));
+                    el.textContent = newValue + 'ms';
+                    
+                    // Update color based on latency
+                    if (newValue < 40) {
+                        el.className = 'good';
+                    } else if (newValue < 80) {
+                        el.className = 'warning';
+                    } else {
+                        el.className = 'critical';
+                    }
+                }
+            });
+            
+            // Update latency bar
+            const avgLatency = document.querySelector('.latency-bar .latency-item:nth-child(2) .latency-value');
+            const peakLatency = document.querySelector('.latency-bar .latency-item:nth-child(3) .latency-value');
+            
+            const newAvg = Math.max(20, Math.min(90, parseInt(avgLatency.textContent) + Math.floor(Math.random() * 10) - 5));
+            const newPeak = Math.max(40, Math.min(99, parseInt(peakLatency.textContent) + Math.floor(Math.random() * 15) - 7));
+            
+            avgLatency.textContent = newAvg + 'ms';
+            peakLatency.textContent = newPeak + 'ms';
+            
+            avgLatency.className = newAvg < 40 ? 'latency-value good' : 
+                                  newAvg < 80 ? 'latency-value warning' : 'latency-value critical';
+                                  
+            peakLatency.className = newPeak < 40 ? 'latency-value good' : 
+                                   newPeak < 80 ? 'latency-value warning' : 'latency-value critical';
+        }, 3000);
+    </script>
+</body>
+</html>
